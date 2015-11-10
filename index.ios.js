@@ -107,8 +107,9 @@ var TextSnippet = React.createClass({
     return (
       <View
         style={[styles.snippet, styles.textSnippet]}>
-        <Text>{this.props.snippet.name}</Text>
-        <Text>{this.props.snippet.code}</Text>
+        <Text style={styles.snippetName}>{this.props.snippet.name}</Text>
+        <View style={styles.nameDivider}/>
+        <Text style={styles.textSnippetCode}>{this.props.snippet.code}</Text>
       </View>
     );
   }
@@ -126,7 +127,9 @@ var HEXSnippet = React.createClass({
           }
         ]}
         >
-        <Text style={styles.HEXSnippetFont}>{this.props.snippet.code}</Text>
+        <Text style={styles.snippetName}>{this.props.snippet.name}</Text>
+        <View style={styles.nameDivider}/>
+        <Text style={styles.HEXSnippetCode}>{this.props.snippet.code}</Text>
       </View>
     );
   }
@@ -140,25 +143,42 @@ var styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap'
   },
-  row : {
+  row: {
     flex: 1,
   },
-  snippet : {
+  snippet: {
     flex: 1,
-    width: 200,
-    height: 200,
+    height: 112,
     overflow: 'hidden',
+    padding: 7,
   },
-  textSnippet : {
-    backgroundColor : '#CCCDDD'
+  textSnippet: {
+    backgroundColor: '#282C35',
   },
-  HEXSnippet : {
-    flex: 1,
-    alignItems : 'center',
-    justifyContent: 'center',
+  snippetName: {
+    fontSize: 7,
+    color: '#FFFFFF',
+    paddingBottom: 7
   },
-  HEXSnippetFont : {
-    fontSize: 30
+  textSnippetCode: {
+    fontSize: 6,
+    fontFamily: 'Menlo',
+    color: '#ABB2C1'
+  },
+  HEXSnippet: {
+    //flex: 1,
+    //alignItems : 'center',
+    //justifyContent: 'center',
+  },
+  HEXSnippetCode: {
+    fontSize: 30,
+    color: '#FFFFFF',
+    marginTop: 18
+  },
+  nameDivider: {
+    height: 0.5,
+    backgroundColor: 'rgba(255,255,255,0.30)',
+    marginBottom: 7
   }
 });
 
