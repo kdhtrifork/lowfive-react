@@ -17,6 +17,7 @@ window.navigator.userAgent = 'react-native';
 
 var io = require("socket.io-client/socket.io");
 
+var SERVER_API = '46.101.157.215';
 var grimlinz = React.createClass({
   getInitialState : function(){
     return {
@@ -25,7 +26,7 @@ var grimlinz = React.createClass({
   },
   componentDidMount : function(){
     this.loadSnippets();
-    this.socket = io('http://127.0.0.1:3000', {jsonp: false});
+    this.socket = io(`http://${SERVER_API}:3000`, {jsonp: false});
     this.socket.on('new-snippet', (data) => {
       console.log("Load new-snippet")
       this.loadSnippets();
@@ -33,7 +34,7 @@ var grimlinz = React.createClass({
     console.log("componentDidMount")
   },
   loadSnippets : function(){
-    fetch('http://192.168.8.211:3000/snippets', {
+    fetch(`http://${SERVER_API}:3000/snippets`, {
       method : 'GET',
       headers: {
        'Accept': 'application/json',
