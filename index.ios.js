@@ -13,11 +13,14 @@ var {
   TouchableHighlight
 } = React;
 
+var GridView = require('react-native-grid-view');
+
 window.navigator.userAgent = 'react-native';
 
 var io = require("socket.io-client/socket.io");
 
 var SERVER_API = '46.101.157.215';
+
 var grimlinz = React.createClass({
   getInitialState : function(){
     return {
@@ -28,10 +31,8 @@ var grimlinz = React.createClass({
     this.loadSnippets();
     this.socket = io(`http://${SERVER_API}:3000`, {jsonp: false});
     this.socket.on('new-snippet', (data) => {
-      console.log("Load new-snippet")
       this.loadSnippets();
     });
-    console.log("componentDidMount")
   },
   loadSnippets : function(){
     fetch(`http://${SERVER_API}:3000/snippets`, {
@@ -44,6 +45,13 @@ var grimlinz = React.createClass({
     .then((response) => response.json())
     .then((json) => {
       if( this.isMounted() ){
+
+        if ( json.length % 3 !== 0){
+          while(json.length % 3 !== 0){
+            json.push([]);
+          }
+        }
+
         this.setState({
           snippets : json
         });
@@ -52,26 +60,43 @@ var grimlinz = React.createClass({
   },
   render: function() {
     return (
-      <View style={styles.container}>
-        {this.state.snippets.map( (snippet) => {
-          return <SnippetButton snippet={snippet}/>
-        })}
-      </View>
+      <GridView
+        contentContainerStyle={styles.container}
+        items={this.state.snippets}
+        renderItem={this._renderItem}
+        itemsPerRow={3}
+        />
     );
   },
+  _renderItem : function(rowData){
+      return (
+          <View style={styles.row}>
+            <SnippetButton snippet={rowData}/>
+          </View>
+      );
+  }
 
 
 });
 
 var SnippetButton = React.createClass({
     getSnippetType : function(){
-      return this.props.type
+      return this.props.snippet.type
     },
     render : function(){
+      var SnippetElement;
+      switch (this.getSnippetType()){
+        case "HEX":
+          SnippetElement = <HEXSnippet snippet={this.props.snippet}/>
+          break;
+        default:
+          SnippetElement = <TextSnippet snippet={this.props.snippet}/>
+      }
       return (
-        <TouchableHighlight
-          style={styles.snippet} >
-          <TextSnippet snippet={this.props.snippet}/>
+        <TouchableHighlight>
+          <View>
+            {SnippetElement}
+          </View>
         </TouchableHighlight>
       )
     }
@@ -81,9 +106,27 @@ var TextSnippet = React.createClass({
   render : function(){
     return (
       <View
-        style={styles.TextSnippet}>
+        style={[styles.snippet, styles.textSnippet]}>
         <Text>{this.props.snippet.name}</Text>
         <Text>{this.props.snippet.code}</Text>
+      </View>
+    );
+  }
+});
+
+var HEXSnippet = React.createClass({
+  render : function(){
+    return (
+      <View
+        style={[
+          styles.snippet,
+          styles.HEXSnippet,
+          {
+          backgroundColor : this.props.snippet.code
+          }
+        ]}
+        >
+        <Text style={styles.HEXSnippetFont}>{this.props.snippet.code}</Text>
       </View>
     );
   }
@@ -92,25 +135,30 @@ var TextSnippet = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
-    flexWrap : 'wrap',
+    alignItems : 'flex-start',
     justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    backgroundColor: '#F5FCFF',
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  row : {
+    flex: 1,
   },
   snippet : {
     flex: 1,
-    borderStyle: 'solid',
-    borderColor: '#00FF 00',
-    borderWidth: 1,
-    backgroundColor : '#CCCDDD',
-    width : 100,
-    height: 100,
+    width: 200,
+    height: 200,
     overflow: 'hidden',
-    textAlign: 'center'
   },
   textSnippet : {
+    backgroundColor : '#CCCDDD'
+  },
+  HEXSnippet : {
     flex: 1,
+    alignItems : 'center',
+    justifyContent: 'center',
+  },
+  HEXSnippetFont : {
+    fontSize: 30
   }
 });
 
